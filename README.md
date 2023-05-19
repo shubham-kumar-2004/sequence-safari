@@ -1,4 +1,4 @@
-# sequence-safari
+# Sequence Safari
 
 
 The Snake Game is a simple implementation of the classic snake game. The game board is a 30x30 grid, and the snake starts at the position (5, 15). The objective is to control the snake and eat pieces of food to grow in length. The game ends if the snake hits a wall or its own body.
