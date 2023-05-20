@@ -1,26 +1,45 @@
-# Sequence Safari
+# Snake Game
 
+This is a simple Snake Game implemented in JavaScript. The game allows the player to control a snake and navigate it around the game area to eat food while avoiding collisions with obstacles and the snake's own body. The objective is to achieve the highest possible score before losing all lives or running out of time.
 
-The Snake Game is a simple implementation of the classic snake game. The game board is a 30x30 grid, and the snake starts at the position (5, 15). The objective is to control the snake and eat pieces of food to grow in length. The game ends if the snake hits a wall or its own body.
+## Instructions
+
+1. Use the arrow keys to control the snake's movement: up, down, left, and right.
+2. The snake grows longer and the score increases when it eats food.
+3. Colliding with obstacles or the snake's own body results in losing a life.
+4. The game ends when all lives are lost or when the time runs out.
+5. After game over, you can choose to restart the game.
 
 ## Functions
 
-The code is divided into several functions:
+- `init()`: Initializes the game and starts the game loop.
+- `createFood()`: Generates random coordinates for the food object.
+- `createObstacle()`: Generates random coordinates for the obstacle object.
+- `drawFood()`: Renders the food object on the canvas.
+- `drawObstacle()`: Renders the obstacle object on the canvas.
+- `drawScore()`: Displays the player's score on the canvas.
+- `drawLives()`: Displays the player's remaining lives on the canvas.
+- `drawTime()`: Displays the remaining time on the canvas.
+- `checkCollision(obj1, obj2)`: Checks for collision between two objects.
+- `checkBoundaryCollision()`: Checks if the snake has collided with the game boundaries.
+- `checkSelfCollision()`: Checks if the snake has collided with itself.
+- `update()`: Updates the game state, including movement, collisions, score, time, and lives.
+- `render()`: Renders the game elements on the canvas.
+- `gameOver()`: Handles the game over scenario.
+- `keyDownHandler(event)`: Handles keyboard input for controlling the snake's movement.
+- `touchStartHandler(event)`: Handles touch input for controlling the snake's movement (for mobile devices).
+- `touchMoveHandler(event)`: Handles touch input for controlling the snake's movement (for mobile devices).
 
-* `updateFoodPosition()`: This function randomly generates a new position for the food.
-* `handleGameOver()`: This function is called when the game is over. It displays an alert message and then reloads the page.
-* `changeDirection()`: This function is called when the user presses an arrow key. It changes the direction of the snake.
-* `initGame()`: This function is called repeatedly to update the game state. It checks if the snake has eaten a piece of food, and if so, it grows the snake and generates a new piece of food. It also checks if the snake has hit a wall or its own body, and if so, it calls the `handleGameOver()` function.
+## How to Run
 
-## Variables
+To run the game locally, follow these steps:
 
-The code uses the following variables:
+1. Clone or download the repository.
+2. Open the `index.html` file in a web browser.
+3. Start playing the Snake Game!
 
-* `gameOver`: This variable is set to `true` when the game is over.
-* `foodX` and `foodY`: These variables store the position of the food.
-* `snakeX` and `snakeY`: These variables store the position of the snake's head.
-* `speedX` and `speedY`: These variables store the snake's direction of movement.
-* `snakeBody`: This array stores the positions of the snake's body.
-* `setIntervalId`: This variable stores the ID of the interval that is used to repeatedly update the game state.
-* `score`: This variable stores the player's score.
-* `highScore`: This variable stores the player's high score.
+## Acknowledgements
+
+This game is built using JavaScript and HTML5. It is inspired by classic snake games and serves as a fun and interactive project for learning game development concepts.
+
+This game was developed as a task for the inductions of the coding club `Delta Force` at NIT Trichy, and I hereby present it as my submission.
