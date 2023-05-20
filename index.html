@@ -1,17 +1,33 @@
+<!DOCTYPE html>
+<html>
   <head>
     <title>Sequence Safari</title>
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
   </head>
   <body>
-    <div class="title-box">
-      <h1>Sequence Safari</h1>
-    </div>
-    <div class="navbar">
-      <div class="game-details">
-        <span class="score">Score: 0</span>
-        <span class="high-score">High Score: 0</span>
+    <div class="start-screen">
+      <h1>Sequence Safari</h1>  
+      <h3>Select Game Mode</h3>
+      <div class="mode-buttons">
+        <button class="mode-button" data-mode="normal">Normal Mode</button>
+        <button class="mode-button" data-mode="advanced">Advanced Mode</button>
       </div>
-      <div class="gameboard"></div>
+    </div>
+
+    <div class="game-screen" style="display: none;">
+      <div class="title-box">
+        <h1>Sequence Safari</h1>
+      </div>
+      <div class="navbar">
+        <div class="game-details">
+          <span class="score">Score: 0</span>
+          <span class="high-score">High Score: 0</span>
+          <span class="lives">Lives: 1</span>
+          <span class="timer">Time: 20 sec</span>
+        </div>
+        <div class="gameboard"></div>
+      </div>
     </div>
   </body>
+</html>
