@@ -1,147 +1,252 @@
-@import url('https://fonts.googleapis.com/css2?family=Unbounded&display=swap');
+const gameBoard = document.querySelector(".gameboard");
+const scoreElement = document.querySelector(".score");
+const highScoreElement = document.querySelector(".high-score");
+const livesElement = document.querySelector(".lives");
+const timerElement = document.querySelector(".timer");
+const controls = document.querySelectorAll(".controls i");
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Unbounded', sans-serif;
-}
+let gameOver = false;
+let foodX, foodY;
+let snakeX = 5,
+  snakeY = 15;
+let speedX = 0,
+  speedY = 0;
+let snakeBody = [];
+let score = 0;
+let lives = 3;
+let timer = 30;
+let gameLoopInterval = 100;
+let gameLoopId;
+let timerIntervalId;
 
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: #131736fb;
-}
+let highScore = localStorage.getItem("high-score") || 0;
+highScoreElement.innerText = `High Score: ${highScore}`;
+livesElement.innerText = `Lives: ${lives}`;
 
-.title-box {
-  display: flex;
-  color: #00ff26;
-  font-family: 'Unbounded', sans-serif;
-  letter-spacing: 2px;
-  line-height: 100px;
-  height: 100px;
-  text-align: center;
-}
+const updateFoodPosition = () => {
+  foodX = Math.floor(Math.random() * 30) + 1;
+  foodY = Math.floor(Math.random() * 30) + 1;
+};
 
-.navbar {
-  width: 74vmin;
-  height: 80vmin;
-  display: flex;
-  overflow: hidden;
-  flex-direction: column;
-  justify-content: center;
-  border-radius: 5px;
-  background: #203253;
-  box-shadow: 0 20px 40px rgba(52, 87, 220, 0.2);
-}
+const handleGameOver = () => {
+  clearInterval(gameLoopId);
+  clearInterval(timerIntervalId);
+  const splashScreen = document.createElement("div");
+  splashScreen.classList.add("game-over-splash");
+  splashScreen.innerHTML = `
+    <h2>Game Over!</h2>
+    <p>Press Enter to replay!</p>
+  `;
+  document.body.appendChild(splashScreen);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      location.reload();
+    }
+  });
+};
 
-.title-box {
-  color: #00ff26;
-  font-weight: 500;
-  font-size: 1.2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+const changeDirection = (e) => {
+  if (e.key === "ArrowUp" && speedY !== 1) {
+    speedX = 0;
+    speedY = -1;
+  } else if (e.key === "ArrowDown" && speedY !== -1) {
+    speedX = 0;
+    speedY = 1;
+  } else if (e.key === "ArrowLeft" && speedX !== 1) {
+    speedX = -1;
+    speedY = 0;
+  } else if (e.key === "ArrowRight" && speedX !== -1) {
+    speedX = 1;
+    speedY = 0;
+  }
+};
 
-.game-details {
-  color: #00ff26;
-  font-weight: 500;
-  font-size: 1.2rem;
-  padding: 20px 25px;
-  display: flex;
-  justify-content: space-between;
-}
+controls.forEach((button) =>
+  button.addEventListener("click", () =>
+    changeDirection({ key: button.dataset.key })
+  )
+);
 
-.game-details .timer {
-  color: #00ff26; /* Color for the timer */
-}
+const updateTimer = () => {
+  timerElement.innerText = `Time: ${timer} sec`;
+  if (timer === 0) {
+    gameOver = true;
+  }
+};
 
-.gameboard {
-  height: 100%;
-  width: 100%;
-  display: grid;
-  background: #1c2840;
-  grid-template: repeat(30, 1fr) / repeat(30, 1fr);
-}
+const updateScore = () => {
+  scoreElement.innerText = `Score: ${score}`;
+  highScore = score >= highScore ? score : highScore;
+  localStorage.setItem("high-score", highScore);
+  highScoreElement.innerText = `High Score: ${highScore}`;
+};
 
-.food {
-  background: #ff00dd;
-}
+let obstacles = [];
 
-.head {
-  background: #00ff55;
-}
+const generateObstacles = () => {
+  obstacles = [];
+  for (let i = 0; i < 5; i++) {
+    const obstacleX = Math.floor(Math.random() * 30) + 1;
+    const obstacleY = Math.floor(Math.random() * 30) + 1;
+    obstacles.push({ x: obstacleX, y: obstacleY });
+  }
+};
 
-.game-over-splash {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 24px;
-}
+const updateRegularMode = () => {
+  if (gameOver) return handleGameOver();
+  let html = `<div class="food" style="grid-area: ${foodY} / ${foodX}"></div>`;
 
-.game-over-splash h2 {
-  margin-bottom: 10px;
-}
+  snakeX += speedX;
+  snakeY += speedY;
 
-.game-over-splash p {
-  margin: 0;
-}
+  for (let i = snakeBody.length - 1; i > 0; i--) {
+    snakeBody[i] = snakeBody[i - 1];
+  }
+  snakeBody[0] = [snakeX, snakeY];
 
-.start-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  if (snakeX <= 0 || snakeX > 30 || snakeY <= 0 || snakeY > 30) {
+    snakeX = 5;
+    snakeY = 15;
+    lives--;
+    livesElement.innerText = `Lives: ${lives}`;
+    if (lives === 0) {
+      gameOver = true;
+    }
+  }
 
-.mode-button {
-  font-size: 18px;
-  background: #20283C;
-  width: 230px;
-  padding: 23px;
-  text-align: center;
-  color: #00ff26;
-  border-radius: 5px;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  transition-duration: 0.3s;
-  transition-property: box-shadow, transform;
-  margin-bottom: 10px;
-  border: none;
-  outline: none;
-  display: block; /* Change display property to block */
-}
+  for (let i = 0; i < snakeBody.length; i++) {
+    html += `<div class="head" style="grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}"></div>`;
+    if (
+      i !== 0 &&
+      snakeBody[0][1] === snakeBody[i][1] &&
+      snakeBody[0][0] === snakeBody[i][0]
+    ) {
+      snakeX = 5;
+      snakeY = 15;
+      lives--;
+      livesElement.innerText = `Lives: ${lives}`;
+      if (lives === 0) {
+        gameOver = true;
+      }
+    }
+  }
 
-.mode-button:hover, .mode-button:focus, .mode-button:active {
-  transform: scale(1.1);
-  box-shadow: 0px 0px 40px #75FB55;
-}
+  if (snakeX === foodX && snakeY === foodY) {
+    updateFoodPosition();
+    snakeBody.push([foodY, foodX]);
+    score++;
+    updateScore();
+    timer += 5;
+    gameLoopInterval -= 5;
+    clearInterval(gameLoopId);
+    gameLoopId = setInterval(updateRegularMode, gameLoopInterval);
+  }
 
+  gameBoard.innerHTML = html;
+};
 
-.start-screen h1 {
-  font-size: 42px;
-  color: #00ff26;
-  margin-bottom: 50px;
-  margin-top: 00px;
-  text-shadow: 0px 0px 25px rgba(117, 251, 85, 0.67);
-}
+const updateAdvancedMode = () => {
+  if (gameOver) return handleGameOver();
+  let html = `<div class="food" style="grid-area: ${foodY} / ${foodX}"></div>`;
 
-.start-screen h3 {
-  color: #fff;
-  margin-bottom: 20px;
-  text-shadow: 0px 0px 25px rgba(117, 251, 85, 0.67);
-}
+  snakeX += speedX;
+  snakeY += speedY;
 
-.obstacle {
-  background: #ff0000;
-}
+  for (let i = snakeBody.length - 1; i > 0; i--) {
+    snakeBody[i] = snakeBody[i - 1];
+  }
+  snakeBody[0] = [snakeX, snakeY];
+
+  if (snakeX <= 0 || snakeX > 30 || snakeY <= 0 || snakeY > 30) {
+    snakeX = 5;
+    snakeY = 15;
+    lives--;
+    livesElement.innerText = `Lives: ${lives}`;
+    if (lives === 0) {
+      gameOver = true;
+    }
+  }
+
+  for (let i = 0; i < snakeBody.length; i++) {
+    html += `<div class="head" style="grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}"></div>`;
+    if (
+      i !== 0 &&
+      snakeBody[0][1] === snakeBody[i][1] &&
+      snakeBody[0][0] === snakeBody[i][0]
+    ) {
+      snakeX = 5;
+      snakeY = 15;
+      lives--;
+      livesElement.innerText = `Lives: ${lives}`;
+      if (lives === 0) {
+        gameOver = true;
+      }
+    }
+  }
+
+  for (const obstacle of obstacles) {
+    html += `<div class="obstacle" style="grid-area: ${obstacle.y} / ${obstacle.x}"></div>`;
+    if (snakeX === obstacle.x && snakeY === obstacle.y) {
+      snakeX = 5;
+      snakeY = 15;
+      lives--;
+      livesElement.innerText = `Lives: ${lives}`;
+      if (lives === 0) {
+        gameOver = true;
+      }
+    }
+  }
+
+  if (snakeX === foodX && snakeY === foodY) {
+    updateFoodPosition();
+    snakeBody.push([foodY, foodX]);
+    score++;
+    updateScore();
+    timer += 5;
+    gameLoopInterval -= 5;
+    clearInterval(gameLoopId);
+    gameLoopId = setInterval(updateAdvancedMode, gameLoopInterval);
+  }
+
+  gameBoard.innerHTML = html;
+};
+
+const startGame = () => {
+  updateFoodPosition();
+  if (gameLoopInterval === 80) {
+    generateObstacles();
+  }
+  if (gameLoopInterval === 100) {
+    gameLoopId = setInterval(updateRegularMode, gameLoopInterval);
+  } else if (gameLoopInterval === 80) {
+    gameLoopId = setInterval(updateAdvancedMode, gameLoopInterval);
+  }
+  timerIntervalId = setInterval(() => {
+    if (!gameOver) {
+      updateTimer();
+      timer--;
+    }
+  }, 1000);
+  document.addEventListener("keyup", changeDirection);
+};
+
+const modeButtons = document.querySelectorAll(".mode-button");
+modeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const selectedMode = button.dataset.mode;
+    if (selectedMode === "normal") {
+      // Normal mode settings
+      gameLoopInterval = 100;
+    } else if (selectedMode === "advanced") {
+      // Advanced mode settings
+      gameLoopInterval = 80;
+      timer = 20;
+      lives = 1;
+    }
+    document.querySelector(".start-screen").style.display = "none";
+    document.querySelector(".game-screen").style.display = "block";
+    livesElement.innerText = `Lives: ${lives}`;
+    timerElement.innerText = `Time: ${timer} sec`;
+    startGame();
+  });
+});
