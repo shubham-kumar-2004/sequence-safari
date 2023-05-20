@@ -1,82 +1,147 @@
-const gameBoard = document.querySelector(".gameboard");
-const scoreElement = document.querySelector(".score");
-const highScoreElement = document.querySelector(".high-score");
-const controls = document.querySelectorAll(".controls i");
+@import url('https://fonts.googleapis.com/css2?family=Unbounded&display=swap');
 
-let gameOver = false;
-let foodX, foodY;
-let snakeX = 5, snakeY = 15;
-let speedX = 0, speedY = 0;
-let snakeBody = [];
-let setIntervalId;
-let score = 0;
-
-let highScore = localStorage.getItem("high-score") || 0;
-highScoreElement.innerText = `High Score: ${highScore}`;
-
-const updateFoodPosition = () => {
-    foodX = Math.floor(Math.random() * 30) + 1;
-    foodY = Math.floor(Math.random() * 30) + 1;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Unbounded', sans-serif;
 }
 
-const handleGameOver = () => {
-    clearInterval(setIntervalId);
-    alert("Game Over! Press Enter to replay!");
-    location.reload();
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #131736fb;
 }
 
-const changeDirection = e => {
-    if(e.key === "ArrowUp" && speedY != 1) {
-        speedX = 0;
-        speedY = -1;
-    } else if(e.key === "ArrowDown" && speedY != -1) {
-        speedX = 0;
-        speedY = 1;
-    } else if(e.key === "ArrowLeft" && speedX != 1) {
-        speedX = -1;
-        speedY = 0;
-    } else if(e.key === "ArrowRight" && speedX != -1) {
-        speedX = 1;
-        speedY = 0;
-    }
+.title-box {
+  display: flex;
+  color: #00ff26;
+  font-family: 'Unbounded', sans-serif;
+  letter-spacing: 2px;
+  line-height: 100px;
+  height: 100px;
+  text-align: center;
 }
 
-controls.forEach(button => button.addEventListener("click", () => changeDirection({ key: button.dataset.key })));
-
-const initGame = () => {
-    if(gameOver) return handleGameOver();
-    let html = `<div class="food" style="grid-area: ${foodY} / ${foodX}"></div>`;
-
-    if(snakeX === foodX && snakeY === foodY) {
-        updateFoodPosition();
-        snakeBody.push([foodY, foodX]);
-        score++;
-        highScore = score >= highScore ? score : highScore;
-        localStorage.setItem("high-score", highScore);
-        scoreElement.innerText = `Score: ${score}`;
-        highScoreElement.innerText = `High Score: ${highScore}`;
-    }
-    snakeX += speedX;
-    snakeY += speedY;
-    
-    for (let i = snakeBody.length - 1; i > 0; i--) {
-        snakeBody[i] = snakeBody[i - 1];
-    }
-    snakeBody[0] = [snakeX, snakeY]; 
-
-    if(snakeX <= 0 || snakeX > 30 || snakeY <= 0 || snakeY > 30) {
-        return gameOver = true;
-    }
-
-    for (let i = 0; i < snakeBody.length; i++) {
-        html += `<div class="head" style="grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}"></div>`;
-        if (i !== 0 && snakeBody[0][1] === snakeBody[i][1] && snakeBody[0][0] === snakeBody[i][0]) {
-            gameOver = true;
-        }
-    }
-    gameBoard.innerHTML = html;
+.navbar {
+  width: 74vmin;
+  height: 80vmin;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 5px;
+  background: #203253;
+  box-shadow: 0 20px 40px rgba(52, 87, 220, 0.2);
 }
 
-updateFoodPosition();
-setIntervalId = setInterval(initGame, 100);
-document.addEventListener("keyup", changeDirection);
+.title-box {
+  color: #00ff26;
+  font-weight: 500;
+  font-size: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-details {
+  color: #00ff26;
+  font-weight: 500;
+  font-size: 1.2rem;
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.game-details .timer {
+  color: #00ff26; /* Color for the timer */
+}
+
+.gameboard {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  background: #1c2840;
+  grid-template: repeat(30, 1fr) / repeat(30, 1fr);
+}
+
+.food {
+  background: #ff00dd;
+}
+
+.head {
+  background: #00ff55;
+}
+
+.game-over-splash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 24px;
+}
+
+.game-over-splash h2 {
+  margin-bottom: 10px;
+}
+
+.game-over-splash p {
+  margin: 0;
+}
+
+.start-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mode-button {
+  font-size: 18px;
+  background: #20283C;
+  width: 230px;
+  padding: 23px;
+  text-align: center;
+  color: #00ff26;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition-duration: 0.3s;
+  transition-property: box-shadow, transform;
+  margin-bottom: 10px;
+  border: none;
+  outline: none;
+  display: block; /* Change display property to block */
+}
+
+.mode-button:hover, .mode-button:focus, .mode-button:active {
+  transform: scale(1.1);
+  box-shadow: 0px 0px 40px #75FB55;
+}
+
+
+.start-screen h1 {
+  font-size: 42px;
+  color: #00ff26;
+  margin-bottom: 50px;
+  margin-top: 00px;
+  text-shadow: 0px 0px 25px rgba(117, 251, 85, 0.67);
+}
+
+.start-screen h3 {
+  color: #fff;
+  margin-bottom: 20px;
+  text-shadow: 0px 0px 25px rgba(117, 251, 85, 0.67);
+}
+
+.obstacle {
+  background: #ff0000;
+}
