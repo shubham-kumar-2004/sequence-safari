@@ -29,8 +29,6 @@ You can play the game [here](https://shubham-kumar-2004.github.io/sequence-safar
 - `render()`: Renders the game elements.
 - `gameOver()`: Handles the game over scenario.
 - `keyDownHandler(event)`: Handles keyboard input for controlling the snake's movement.
-- `touchStartHandler(event)`: Handles touch input for controlling the snake's movement (for mobile devices).
-- `touchMoveHandler(event)`: Handles touch input for controlling the snake's movement (for mobile devices).
 
 ## How to Run
 
