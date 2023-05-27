@@ -56,7 +56,7 @@ body {
 }
 
 .game-details .timer {
-  color: #00ff26; /* Color for the timer */
+  color: #00ff26;
 }
 
 .gameboard {
@@ -119,7 +119,7 @@ body {
   margin-bottom: 10px;
   border: none;
   outline: none;
-  display: block; /* Change display property to block */
+  display: block; 
 }
 
 .mode-button:hover, .mode-button:focus, .mode-button:active {
